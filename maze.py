@@ -72,8 +72,8 @@ class Cell:
 
 class Maze:
     def __init__(self,x1,y1,num_rows,num_cols,cell_size_x,cell_size_y,win=None,seed=None):
-        self.x1 = x1
-        self.y1 = y1
+        self.x1 = x1 + 10
+        self.y1 = y1 + 10
         self.num_rows = num_rows
         self.num_cols = num_cols
         self.cell_size_x = cell_size_x
@@ -112,7 +112,7 @@ class Maze:
 
     def _animate(self):
         self.win.redraw()
-        time.sleep(0.05)  # Delay for visual effect
+        time.sleep(0.005)  # Delay for visual effect
 
     def _breake_entrance_and_exit(self):
         self._cells[0][0].has_top_wall = False
@@ -166,4 +166,52 @@ class Maze:
         for col in range(self.num_cols):
             for row in range(self.num_rows): 
                 self._cells[col][row].visited = False
+
+    def solve(self):
+        return self._solve_r(0, 0)
+    
+    def _solve_r(self, i, j):
+        self._animate()
+        current = self._cells[i][j]
+        current.visited = True
+        if current == self._cells[self.num_cols - 1][self.num_rows - 1]:
+            return True
+        directions = [
+            ("left", i - 1, j),
+            ("right", i + 1, j),
+            ("top", i, j - 1),
+            ("bottom", i, j + 1),
+        ]
+
+        for direction, next_i, next_j in directions:
+            if 0 <= next_i < self.num_cols and 0 <= next_j < self.num_rows:
+                next_cell = self._cells[next_i][next_j]
+
+                # Check wall & visit status
+                if not next_cell.visited:
+                    if direction == "left" and not current.has_left_wall:
+                        current.draw_move(next_cell)
+                        if self._solve_r(next_i, next_j):
+                            return True
+                        current.draw_move(next_cell, undo=True)
+
+                    elif direction == "right" and not current.has_right_wall:
+                        current.draw_move(next_cell)
+                        if self._solve_r(next_i, next_j):
+                            return True
+                        current.draw_move(next_cell, undo=True)
+
+                    elif direction == "top" and not current.has_top_wall:
+                        current.draw_move(next_cell)
+                        if self._solve_r(next_i, next_j):
+                            return True
+                        current.draw_move(next_cell, undo=True)
+
+                    elif direction == "bottom" and not current.has_bottom_wall:
+                        current.draw_move(next_cell)
+                        if self._solve_r(next_i, next_j):
+                            return True
+                        current.draw_move(next_cell, undo=True)
+
+        return False
             

@@ -9,7 +9,7 @@ class Window:
         self.root.title("My Window")
         self.root.geometry(f"{width}x{height}")
         self.root.protocol("WM_DELETE_WINDOW", self.close)
-        self.canvas = Canvas(self.root, width=width, height=height)
+        self.canvas = Canvas(self.root, width=width, height=height, background="white")
         self.canvas.pack()
         self.running = False
 
@@ -32,9 +32,8 @@ class Window:
 def main():
     win = Window(800, 600)
     
-    m1 = Maze(0, 0, 12, 10, 10, 10, win)
-
-    # win.draw_line(line1, "black")
+    m1 = Maze(0, 0, 29, 39, 20, 20, win)
+    m1.solve()
     win.wait_for_close()
 
 main()
